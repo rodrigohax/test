@@ -5,6 +5,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/wait.h>
 #include <netdb.h>
 #include <sys/un.h>
 #include <signal.h>
@@ -15,15 +16,13 @@
 #define MAXNAME 10
 #define K 5
 
-int  count=0, fd[2], candidatos[K];
+int  count=0, fd[2], candidatos[K] = {0,0,0,0,0};
 char tarea[8];
 int sock,s,n,lenght,i,nbytes;
 char buffer[MAXBUF];
 
 
 void servidor_esclavo(int sock);
-void init();
-void enviarListadoCandidatos();
 
 int main () {
     void ctrlc();
@@ -94,7 +93,6 @@ int main () {
             exit(-1);   
         }
 
-        init();
         pidhijo = fork();       
         if ( pidhijo < 0 ) {
             perror("Error en fork() \n");
@@ -104,14 +102,45 @@ int main () {
 
         if ( pidhijo == 0 ){
             servidor_esclavo(s);
+            exit(0);
         }
 
         else{
-            /* Proceso padre cierra la salida del pipe */
-           // close(fd[1]);
             /* Lee un string del pipe */
-           // read(fd[0], buffer, sizeof(buffer));
-            //printf("Proceso padre: %d, recibio mensaje: %s\n", getpid(), buffer);
+            read(fd[0], buffer, sizeof(buffer));
+            int opcion = *buffer - '0';
+
+            switch(opcion){
+                case 1:
+                printf("vote por charlatan 1\n");
+                candidatos[0]++;
+                break;
+                case 2:
+                printf("vote x dario\n");
+                candidatos[1]++;
+                break;
+                case 3:
+                printf("vote x flakito\n");
+                candidatos[2]++;
+                break;
+                case 4:
+                printf("vote x peppa\n");
+                candidatos[3]++;
+                break;
+                default : 
+                printf("elije una weaxdddddd\n");
+                break;
+            }
+
+            printf("**************************************\n");
+            printf("************ RESULTADOS **************\n");
+            printf("**************************************\n");
+            printf("Charlatan: %d\n",candidatos[0]);
+            printf("Dario: %d\n",candidatos[1]);
+            printf("Flakito: %d\n", candidatos[2]);
+            printf("Peppa: %d\n", candidatos[3]);
+
+            wait(NULL);
         }
     }
 
@@ -127,62 +156,16 @@ void servidor_esclavo(int sock) {
         printf ("Fin de la Conexion\n");        
     }
 
-    printf("Proceso hijo: %d, recibio RUT: %s\n", getpid(), buffer);
+    //printf("Proceso hijo: %d, recibio RUT: %s\n", getpid(), buffer);
 
     recv(sock,buffer,sizeof(buffer),0);
 
-    int opcion = *buffer - '0'; // CONVIERTE LA OPCION A INT 
-    switch(opcion){
-        case 1:
-        printf("vote por charlatan 1\n");
-        candidatos[0]++;
-        break;
-        case 2:
-        printf("vote x dario\n");
-        candidatos[1]++;
-        break;
-        case 3:
-        printf("vote x flakito\n");
-        candidatos[2]++;
-        break;
-        case 4:
-        printf("vote x peppa\n");
-        candidatos[3]++;
-        break;
-        case 5:
-        printf("vote x perreke");
-        candidatos[3]++;
-        break;
-        default : 
-        printf("elije una weaxdddddd\n");
-        break;
-    }
-
-    enviarListadoCandidatos();
-    /* Proceso hijo cierra la entrada del pipe */
-    close(fd[0]);
+        /* Proceso hijo cierra la entrada del pipe */
     /* Envia el string a traves del pipe */
-    write(fd[1], "buffer", sizeof(buffer));    
+    write(fd[1], buffer, sizeof(buffer));
+    close(fd[1]);
 }
 
-void init(){
-    int i;
-    for(i=0;i<K;i++){
-        candidatos[i] = 0;
-    }
-}
-
-
-void enviarListadoCandidatos(){
-    char *mensaje = (char*) malloc(512);
-    int i;
-    sprintf(mensaje,"\nListado de candidatos\nSeleccione una opcion:\n");
-    send(s,mensaje,strlen(mensaje),0);
-    for(i=0;i<K;i++){
-        sprintf(mensaje,"%d) candidato %d\n",(i+1),candidatos[i]);
-        send(s,mensaje,strlen(mensaje),0);
-    }
-}
 
 void ctrlc() {
     printf("\nServidor is OUT\n");

@@ -1,6 +1,6 @@
 /*
 Cliente
-Tarea 1 - SO
+Tarea 2 - SO
 Karla Leal Salazar - Rodrigo Meneses Fierro
 */
 #include <stdio.h>
@@ -75,17 +75,6 @@ int main (int argc, char *argv[]) {
       printf("send() %s \n", strerror(errno));
       exit(-1);
     }
-
-        // Recibe desde el servidor
-    nBytes = recv(sock, buffer, MAXBUF, 0);
-    if ( nBytes < 0 ) {
-      perror("Error recv() \n");
-      printf("recv() %s \n", strerror(errno));
-      exit(-1);
-    }
-    buffer[nBytes] = '\0';
-
-    printf("\n%s", buffer); printf("\n");
     
     exit(0);
   }
