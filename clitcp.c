@@ -62,10 +62,23 @@ int main (int argc, char *argv[]) {
       exit(-1);
     }
     int sent = send(sock,argv[3],sizeof(argv[3]),0);
+
+
+        // Recibe desde el servidor
+    nBytes = recv(sock, buffer, MAXBUF, 0);
+    if ( nBytes < 0 ) {
+      perror("Error recv() \n");
+      printf("recv() %s \n", strerror(errno));
+      exit(-1);
+    }
+    buffer[nBytes] = '\0';
+
+    printf("\n%s", buffer); printf("\n");
+
     // Envia solicitud
     char solicitud[10];
-    printf("Ingrese su solicitud\n");
-    scanf("%s", solicitud);
+    printf("Selecione un candidato del 1 al 5\n");
+    scanf("%s", solicitud); 
     strcpy(buffer, solicitud);
 
     // Envía el contenido string (del tamaño del buffer)
@@ -75,7 +88,8 @@ int main (int argc, char *argv[]) {
       printf("send() %s \n", strerror(errno));
       exit(-1);
     }
-    
+
+    buffer[nBytes] = '\0';
     exit(0);
   }
 

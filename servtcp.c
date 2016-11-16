@@ -1,5 +1,8 @@
-/*Servidor Concurrente*/
-
+/*
+Servidor Concurrente
+Tarea 2 - SO
+Karla Leal Salazar - Rodrigo Meneses Fierro
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -112,34 +115,29 @@ int main () {
 
             switch(opcion){
                 case 1:
-                printf("vote por charlatan 1\n");
                 candidatos[0]++;
                 break;
                 case 2:
-                printf("vote x dario\n");
                 candidatos[1]++;
                 break;
                 case 3:
-                printf("vote x flakito\n");
                 candidatos[2]++;
                 break;
                 case 4:
-                printf("vote x peppa\n");
                 candidatos[3]++;
                 break;
-                default : 
-                printf("elije una weaxdddddd\n");
+                default :
                 break;
             }
 
             printf("**************************************\n");
             printf("************ RESULTADOS **************\n");
             printf("**************************************\n");
-            printf("Charlatan: %d\n",candidatos[0]);
-            printf("Dario: %d\n",candidatos[1]);
-            printf("Flakito: %d\n", candidatos[2]);
-            printf("Peppa: %d\n", candidatos[3]);
-
+            printf("Pedro Rodriguez: %d\n",candidatos[0]);
+            printf("Pedro Campos: %d\n",candidatos[1]);
+            printf("Clemente Rubio: %d\n", candidatos[2]);
+            printf("Miguel Vidal: %d\n", candidatos[3]);
+            printf("Patricio Galvez: %d\n", candidatos[4]);
             wait(NULL);
         }
     }
@@ -156,11 +154,23 @@ void servidor_esclavo(int sock) {
         printf ("Fin de la Conexion\n");        
     }
 
-    //printf("Proceso hijo: %d, recibio RUT: %s\n", getpid(), buffer);
+    char *mensaje = (char*) malloc(512);
+    sprintf(mensaje,"\nListado de candidatos\n");
+    send(s,mensaje,strlen(mensaje),0);
+    sprintf(mensaje,"\n1.- Pedro Rodriguez");
+    send(s,mensaje,strlen(mensaje),0);
+    sprintf(mensaje,"\n2.- Pedro Campos");
+    send(s,mensaje,strlen(mensaje),0);
+    sprintf(mensaje,"\n3.- Clemente Rubio");
+    send(s,mensaje,strlen(mensaje),0);
+    sprintf(mensaje,"\n4.- Miguel Vidal");
+    send(s,mensaje,strlen(mensaje),0);
+    sprintf(mensaje,"\n5.- Patricio Galvez");
+    send(s,mensaje,strlen(mensaje),0);
 
     recv(sock,buffer,sizeof(buffer),0);
 
-        /* Proceso hijo cierra la entrada del pipe */
+
     /* Envia el string a traves del pipe */
     write(fd[1], buffer, sizeof(buffer));
     close(fd[1]);
